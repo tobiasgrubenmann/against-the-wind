@@ -5,9 +5,13 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/BoxComponent.h"
+#include "WindSubsystem.h"
 #include "AerodynamicForceReceiver.generated.h"
 
 
+/**
+ * Every actor having this component will experience aerodynamic forces.
+ */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class WINDPHYSICS_API UAerodynamicForceReceiver : public UActorComponent
 {
@@ -28,20 +32,17 @@ public:
 private:
 
 	UPROPERTY()
+	TObjectPtr<UWindSubsystem> WindSubsystem;
+
+	UPROPERTY()
 	TObjectPtr<UPrimitiveComponent> TargetComponent;
 
 	UPROPERTY()
 	TObjectPtr<UBoxComponent> BoxComponent;
 
 	UPROPERTY(EditAnywhere)
-	FVector WindVelocity;
-
-	UPROPERTY(EditAnywhere)
-	float Density;
-
-	UPROPERTY(EditAnywhere)
 	float AerodynamicConstant;
 
-	void AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4);
+	void AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, UWindComponent* Wind);
 		
 };

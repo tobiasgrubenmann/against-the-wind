@@ -2,6 +2,8 @@
 
 
 #include "AerodynamicForceReceiver.h"
+#include "Kismet/GameplayStatics.h"
+#include "WindComponent.h"
 
 
 UAerodynamicForceReceiver::UAerodynamicForceReceiver()
@@ -15,6 +17,8 @@ void UAerodynamicForceReceiver::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(GetWorld());
+	WindSubsystem = GameInstance->GetSubsystem<UWindSubsystem>();
 }
 
 
@@ -22,7 +26,10 @@ void UAerodynamicForceReceiver::TickComponent(float DeltaTime, ELevelTick TickTy
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (TargetComponent != nullptr && BoxComponent != nullptr)
+	// Get a reference to the current wind.
+	UWindComponent* Wind = WindSubsystem->GetWind();
+
+	if (TargetComponent != nullptr && BoxComponent != nullptr && Wind != nullptr)
 	{
 		// Create vectors for the three planes that define the aerodynamic forces.
 
@@ -36,19 +43,22 @@ void UAerodynamicForceReceiver::TickComponent(float DeltaTime, ELevelTick TickTy
 			BoxComponent->GetComponentLocation() + BoxRight + BoxUp,
 			BoxComponent->GetComponentLocation() - BoxRight + BoxUp,
 			BoxComponent->GetComponentLocation() - BoxRight - BoxUp,
-			BoxComponent->GetComponentLocation() + BoxRight - BoxUp);
+			BoxComponent->GetComponentLocation() + BoxRight - BoxUp,
+			Wind);
 
 		AddAerodynamicForce(
 			BoxComponent->GetComponentLocation() + BoxForward + BoxUp,
 			BoxComponent->GetComponentLocation() - BoxForward + BoxUp,
 			BoxComponent->GetComponentLocation() - BoxForward - BoxUp,
-			BoxComponent->GetComponentLocation() + BoxForward - BoxUp);
+			BoxComponent->GetComponentLocation() + BoxForward - BoxUp,
+			Wind);
 
 		AddAerodynamicForce(
 			BoxComponent->GetComponentLocation() + BoxForward + BoxRight,
 			BoxComponent->GetComponentLocation() - BoxForward + BoxRight,
 			BoxComponent->GetComponentLocation() - BoxForward - BoxRight,
-			BoxComponent->GetComponentLocation() + BoxForward - BoxRight);
+			BoxComponent->GetComponentLocation() + BoxForward - BoxRight,
+			Wind);
 	}
 }
 
@@ -60,11 +70,11 @@ void UAerodynamicForceReceiver::Setup(UPrimitiveComponent* Receiver, UBoxCompone
 }
 
 
-void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4)
+void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, UWindComponent* Wind)
 {
 	FVector RelativeVelocity1 = TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector1) / 4;
 
-	FVector RelativeVelocity = WindVelocity
+	FVector RelativeVelocity = Wind->GetVelocity();
 		- RelativeVelocity1//TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector1) / 4
 		- TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector2) / 4
 		- TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector3) / 4
@@ -88,7 +98,7 @@ void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vec
 		float CrossSectionalArea = (TriangleArea1 + TriangleArea2) * RelativeVelocity.Dot(Normal) / RelativeVelocityMagnitude;
 
 		// Aerodynamic force.
-		FVector Force = 0.5f * Density * RelativeVelocityMagnitude * RelativeVelocityMagnitude * AerodynamicConstant * CrossSectionalArea * Normal;
+		FVector Force = 0.5f * Wind->GetDensity() * RelativeVelocityMagnitude * RelativeVelocityMagnitude * AerodynamicConstant * CrossSectionalArea * Normal;
 
 		// Apply force.
 		TargetComponent->AddForceAtLocation(Force / 4, Vector1);
