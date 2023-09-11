@@ -45,21 +45,30 @@ void UAerodynamicForceReceiver::TickComponent(float DeltaTime, ELevelTick TickTy
 			BoxComponent->GetComponentLocation() - BoxRight + BoxUp,
 			BoxComponent->GetComponentLocation() - BoxRight - BoxUp,
 			BoxComponent->GetComponentLocation() + BoxRight - BoxUp,
-			Wind);
+			Wind->GetVelocity(),
+			Wind->GetDensity(),
+			AerodynamicConstant
+		);
 
 		AddAerodynamicForce(
 			BoxComponent->GetComponentLocation() + BoxForward + BoxUp,
 			BoxComponent->GetComponentLocation() - BoxForward + BoxUp,
 			BoxComponent->GetComponentLocation() - BoxForward - BoxUp,
 			BoxComponent->GetComponentLocation() + BoxForward - BoxUp,
-			Wind);
+			Wind->GetVelocity(),
+			Wind->GetDensity(),
+			AerodynamicConstant
+		);
 
 		AddAerodynamicForce(
 			BoxComponent->GetComponentLocation() + BoxForward + BoxRight,
 			BoxComponent->GetComponentLocation() - BoxForward + BoxRight,
 			BoxComponent->GetComponentLocation() - BoxForward - BoxRight,
 			BoxComponent->GetComponentLocation() + BoxForward - BoxRight,
-			Wind);
+			Wind->GetVelocity(),
+			Wind->GetDensity(),
+			AerodynamicConstant
+		);
 	}
 }
 
@@ -71,9 +80,9 @@ void UAerodynamicForceReceiver::Setup(UPrimitiveComponent* Receiver, UBoxCompone
 }
 
 
-void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, UWindComponent* Wind)
+void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, FVector WindVelocity, float WindDensity, float Constant)
 {
-	FVector RelativeVelocity = Wind->GetVelocity();
+	FVector RelativeVelocity = WindVelocity;
 		- TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector1) / 4
 		- TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector2) / 4
 		- TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector3) / 4
@@ -85,10 +94,10 @@ void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vec
 	{
 		// Check whether corners are blocked.
 
-		float ExposedFraction1 = GetExposedFraction(Vector1, Wind);
-		float ExposedFraction2 = GetExposedFraction(Vector2, Wind);
-		float ExposedFraction3 = GetExposedFraction(Vector3, Wind);
-		float ExposedFraction4 = GetExposedFraction(Vector4, Wind);
+		float ExposedFraction1 = GetExposedFraction(Vector1, WindVelocity);
+		float ExposedFraction2 = GetExposedFraction(Vector2, WindVelocity);
+		float ExposedFraction3 = GetExposedFraction(Vector3, WindVelocity);
+		float ExposedFraction4 = GetExposedFraction(Vector4, WindVelocity);
 
 		float ExposedFraction = ExposedFraction1 + ExposedFraction2 + ExposedFraction3 + ExposedFraction4;
 
@@ -109,7 +118,7 @@ void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vec
 			float CrossSectionalArea = (TriangleArea1 + TriangleArea2) * RelativeVelocity.Dot(Normal) / RelativeVelocityMagnitude * ExposedFraction / 4;
 
 			// Aerodynamic force.
-			FVector Force = 0.5f * Wind->GetDensity() * RelativeVelocityMagnitude * RelativeVelocityMagnitude * AerodynamicConstant * CrossSectionalArea * Normal;
+			FVector Force = 0.5f * WindDensity * RelativeVelocityMagnitude * RelativeVelocityMagnitude * Constant * CrossSectionalArea * Normal;
 
 			// Apply force.
 			TargetComponent->AddForceAtLocation(Force * ExposedFraction1 / ExposedFraction, Vector1);
@@ -122,7 +131,7 @@ void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vec
 }
 
 
-float UAerodynamicForceReceiver::GetExposedFraction(FVector Start, UWindComponent* Wind) const
+float UAerodynamicForceReceiver::GetExposedFraction(FVector Location, FVector WindVelocity) const
 {
 	float Fraction = 1;
 
@@ -134,9 +143,9 @@ float UAerodynamicForceReceiver::GetExposedFraction(FVector Start, UWindComponen
 		GetOwner() // Ignore self.
 	);
 
-	FVector End = Start - Wind->GetVelocity().GetSafeNormal() * MaxTraceLength;
+	FVector End = Location - WindVelocity.GetSafeNormal() * MaxTraceLength;
 	TArray<FHitResult> OutHits;
-	GetWorld()->LineTraceMultiByObjectType(OutHits, Start, End, FCollisionObjectQueryParams(ECollisionChannel::ECC_WorldStatic), TraceParams);
+	GetWorld()->LineTraceMultiByObjectType(OutHits, Location, End, FCollisionObjectQueryParams(ECollisionChannel::ECC_WorldStatic), TraceParams);
 
 	// Check for wind shadow.
 

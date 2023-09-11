@@ -46,8 +46,9 @@ private:
 	UPROPERTY(EditAnywhere)
 	float MaxTraceLength;
 
-	void AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, UWindComponent* Wind);
+public:
+	virtual void AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, FVector WindVelocity, float WindDensity, float AerodynamicConstant);
 
-	float GetExposedFraction(FVector Start, UWindComponent* Wind) const;
+	virtual float GetExposedFraction(FVector Location, FVector WindVelocity) const;
 		
 };

@@ -12,5 +12,6 @@ public class AgainstTheWindEditorTarget : TargetRules
 		IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_3;
 		ExtraModuleNames.Add("AgainstTheWind");
 		ExtraModuleNames.Add("WindPhysics");
+		ExtraModuleNames.Add("WindPhysicsTest");
 	}
 }
