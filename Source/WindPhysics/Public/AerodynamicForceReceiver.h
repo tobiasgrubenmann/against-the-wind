@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Components/BoxComponent.h"
 #include "WindSubsystem.h"
+#include "WindReceiver.h"
 #include "AerodynamicForceReceiver.generated.h"
 
 
@@ -13,7 +14,7 @@
  * Every actor having this component will experience aerodynamic forces.
  */
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class WINDPHYSICS_API UAerodynamicForceReceiver : public UActorComponent
+class WINDPHYSICS_API UAerodynamicForceReceiver : public UWindReceiver
 {
 	GENERATED_BODY()
 
@@ -43,12 +44,7 @@ private:
 	UPROPERTY(EditAnywhere)
 	float AerodynamicConstant;
 
-	UPROPERTY(EditAnywhere)
-	float MaxTraceLength;
-
 public:
 	virtual void AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, FVector WindVelocity, float WindDensity, float AerodynamicConstant);
-
-	virtual float GetExposedFraction(FVector Location, FVector WindVelocity) const;
 		
 };
