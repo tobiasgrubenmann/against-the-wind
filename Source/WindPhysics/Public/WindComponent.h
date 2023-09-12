@@ -24,9 +24,17 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable)
 	FVector GetVelocity() const;
 
+	UFUNCTION(BlueprintCallable)
 	float GetDensity() const;
+
+	UFUNCTION(BlueprintCallable)
+	void RotateWind(float Angle);
+
+	UFUNCTION(BlueprintCallable)
+	void ScaleWind(float Factor);
 
 private:
 	UPROPERTY(EditAnywhere)

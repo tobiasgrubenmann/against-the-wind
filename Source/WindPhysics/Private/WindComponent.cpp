@@ -42,3 +42,15 @@ float UWindComponent::GetDensity() const
 	return Density;
 }
 
+
+void UWindComponent::RotateWind(float Angle)
+{
+	Velocity = Velocity.RotateAngleAxis(Angle, FVector(0, 0, 1));
+}
+
+
+void UWindComponent::ScaleWind(float Factor)
+{
+	Velocity *= Factor;
+}
+
