@@ -28,7 +28,7 @@ void UWindReceiver::TickComponent(float DeltaTime, ELevelTick TickType, FActorCo
 }
 
 
-float UWindReceiver::GetExposedFraction(FVector Location, FVector WindVelocity) const
+float UWindReceiver::GetExposedFraction(const FVector& Location, const FVector& WindVelocity) const
 {
 	float Fraction = 1;
 

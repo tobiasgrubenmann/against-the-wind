@@ -36,6 +36,6 @@ private:
 
 public:
 	UFUNCTION(BlueprintImplementableEvent)
-	void ReceiveWind(FVector EffectiveWind);
+	void ReceiveWind(const FVector& EffectiveWind);
 		
 };

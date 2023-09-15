@@ -80,7 +80,14 @@ void UAerodynamicForceReceiver::Setup(UPrimitiveComponent* Receiver, UBoxCompone
 }
 
 
-void UAerodynamicForceReceiver::AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, FVector WindVelocity, float WindDensity, float Constant)
+void UAerodynamicForceReceiver::AddAerodynamicForce(
+	const FVector& Vector1,
+	const FVector& Vector2,
+	const FVector& Vector3,
+	const FVector& Vector4,
+	const FVector& WindVelocity,
+	float WindDensity,
+	float Constant)
 {
 	FVector RelativeVelocity = WindVelocity;
 		- TargetComponent->GetPhysicsLinearVelocityAtPoint(Vector1) / 4

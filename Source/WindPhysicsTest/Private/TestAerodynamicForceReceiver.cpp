@@ -16,7 +16,7 @@ void UTestAerodynamicForceReceiver::SetExposedFraction(TMap<FVector, float> Frac
 }
 
 
-float UTestAerodynamicForceReceiver::GetExposedFraction(FVector Location, FVector WindVelocity) const
+float UTestAerodynamicForceReceiver::GetExposedFraction(const FVector& Location, const FVector& WindVelocity) const
 {
 	float Fraction = 0;
 

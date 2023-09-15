@@ -31,6 +31,6 @@ private:
 
 public:
 
-	virtual float GetExposedFraction(FVector Location, FVector WindVelocity) const;
+	virtual float GetExposedFraction(const FVector& Location, const FVector& WindVelocity) const;
 		
 };

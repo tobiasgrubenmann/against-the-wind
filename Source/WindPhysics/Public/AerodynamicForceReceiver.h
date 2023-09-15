@@ -45,6 +45,13 @@ private:
 	float AerodynamicConstant;
 
 public:
-	virtual void AddAerodynamicForce(FVector Vector1, FVector Vector2, FVector Vector3, FVector Vector4, FVector WindVelocity, float WindDensity, float AerodynamicConstant);
+	virtual void AddAerodynamicForce(
+		const FVector& Vector1,
+		const FVector& Vector2,
+		const FVector& Vector3,
+		const FVector& Vector4,
+		const FVector& WindVelocity,
+		float WindDensity,
+		float AerodynamicConstant);
 		
 };

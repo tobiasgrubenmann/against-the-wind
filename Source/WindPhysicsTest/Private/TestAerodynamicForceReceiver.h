@@ -20,7 +20,7 @@ public:
 
 	void SetExposedFraction(TMap<FVector, float> FractionsMap);
 
-	float GetExposedFraction(FVector Location, FVector WindVelocity) const override;
+	float GetExposedFraction(const FVector& Location, const FVector& WindVelocity) const override;
 
 private:
 	UPROPERTY()
